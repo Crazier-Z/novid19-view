@@ -16,7 +16,7 @@ router.get("/list", async (req: Request, res: Response) => {
     "https://c.m.163.com/ug/api/wuhan/app/data/list-total?t=169762810310"
   );
   res.json({
-    data: result.data,
+    ...result.data.data,
   });
 });
 

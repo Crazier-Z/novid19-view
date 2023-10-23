@@ -12,21 +12,28 @@ import { useStore } from "./stores";
 import { ref, reactive, onMounted } from "vue";
 import * as echarts from "echarts"; // echarts 5版本引入
 import "./assets/china";
+import { geoCoordMap } from "./assets/geoMap";
 
 const store = useStore();
-store.getList();
 
-onMounted(() => {
+onMounted(async () => {
+  await store.getList();
+  const city = store.list.areaTree[2].children;
+  const data = city.map((v) => {
+    return {
+      name: v.name,
+      value: geoCoordMap[v.name].concat(v.total.confirm),
+    }
+  });
+  console.log("data", data);
+
   const charts = echarts.init(document.getElementById("map") as HTMLElement);
-  const data = [
-    {
-      name: "内蒙古",
-      itemStyle: {
-        areaColor: "#56b1da",
-      },
-      value: [110.3467, 41.4899],
-    },
-  ];
+  // const data = [
+  //   {
+  //     name: "内蒙古",
+  //     value: [110.3467, 41.4899],
+  //   },
+  // ];
   charts.setOption({
     geo: {
       map: "china",
