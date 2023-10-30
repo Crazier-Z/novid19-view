@@ -2,7 +2,31 @@
   <div :style="{ background: `url(${bg})` }" class="box">
     <div class="box-left"></div>
     <div class="box-center" id="map"></div>
-    <div class="box-right"></div>
+    <div style="color: white" class="box-right">
+      <table class="table" border="1" cellspacing="0">
+        <thead>
+          <tr>
+            <th>地区</th>
+            <th>新增确诊</th>
+            <th>累计确诊</th>
+            <th>治愈</th>
+            <th>死亡</th>
+          </tr>
+        </thead>
+        <transition-group
+          tag="tbody"
+          enter-active-class="animate__animated animate__flipInY"
+        >
+          <tr :key="item.id" v-for="item in store.item">
+            <td align="center">{{ item.name }}</td>
+            <td align="center">{{ item.today.confirm }}</td>
+            <td align="center">{{ item.total.confirm }}</td>
+            <td align="center">{{ item.total.heal }}</td>
+            <td align="center">{{ item.total.dead }}</td>
+          </tr>
+        </transition-group>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -13,27 +37,26 @@ import { ref, reactive, onMounted } from "vue";
 import * as echarts from "echarts"; // echarts 5版本引入
 import "./assets/china";
 import { geoCoordMap } from "./assets/geoMap";
+import "animate.css";
 
 const store = useStore();
 
 onMounted(async () => {
   await store.getList();
+  initCharts();
+});
+
+const initCharts = () => {
   const city = store.list.areaTree[2].children;
   const data = city.map((v) => {
     return {
       name: v.name,
       value: geoCoordMap[v.name].concat(v.total.confirm),
-    }
+      children: v.children,
+    };
   });
-  console.log("data", data);
 
   const charts = echarts.init(document.getElementById("map") as HTMLElement);
-  // const data = [
-  //   {
-  //     name: "内蒙古",
-  //     value: [110.3467, 41.4899],
-  //   },
-  // ];
   charts.setOption({
     geo: {
       map: "china",
@@ -137,7 +160,10 @@ onMounted(async () => {
       },
     ],
   });
-});
+  charts.on("click", (e: any) => {
+    store.item = e.data.children;
+  });
+};
 </script>
 
 <style lang="less">
@@ -165,6 +191,21 @@ body,
   }
   &-right {
     width: 400px;
+    .table {
+      width: 100%;
+      background: #212028;
+      tr {
+        th {
+          padding: 5px;
+          white-space: nowrap;
+        }
+        td {
+          padding: 5px 10px;
+          width: 100px;
+          white-space: nowrap;
+        }
+      }
+    }
   }
 }
 </style>
