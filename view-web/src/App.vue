@@ -1,6 +1,39 @@
 <template>
   <div :style="{ background: `url(${bg})` }" class="box">
-    <div class="box-left"></div>
+    <div style="color: white" class="box-left">
+      <div class="box-left-card">
+        <section>
+          <div>较上日+ {{ store.chinaAdd.severe || "未知" }}</div>
+          <div>{{ store.chinaTotal.severe }}</div>
+          <div>本土现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.heal }}</div>
+          <div>{{ store.chinaTotal.heal }}</div>
+          <div>现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.confirm }}</div>
+          <div>{{ store.chinaTotal.confirm }}</div>
+          <div>累计确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.suspect || "未知" }}</div>
+          <div>{{ store.chinaTotal.suspect }}</div>
+          <div>无症状感染者</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.input }}</div>
+          <div>{{ store.chinaTotal.input }}</div>
+          <div>境外输入</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.dead }}</div>
+          <div>{{ store.chinaTotal.dead }}</div>
+          <div>累计死亡</div>
+        </section>
+      </div>
+    </div>
     <div class="box-center" id="map"></div>
     <div style="color: white" class="box-right">
       <table class="table" border="1" cellspacing="0">
@@ -48,6 +81,7 @@ onMounted(async () => {
 
 const initCharts = () => {
   const city = store.list.areaTree[2].children;
+  store.item = city[2].children;
   const data = city.map((v) => {
     return {
       name: v.name,
@@ -171,6 +205,9 @@ const initCharts = () => {
   padding: 0;
   margin: 0;
 }
+@itemColor: #41b0db;
+@itemBg: #223651;
+@itemBorder: #212028;
 
 html,
 body,
@@ -185,6 +222,27 @@ body,
   overflow: hidden;
   &-left {
     width: 400px;
+    &-card {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      grid-template-rows: auto auto;
+
+      section {
+        background: @itemBg;
+        border: 1px solid @itemBorder;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        div:nth-child(2) {
+          color: @itemColor;
+          padding: 10px 0;
+          font-size: 20px;
+          font-weight: bold;
+        }
+      }
+    }
   }
   &-center {
     flex: 1;
