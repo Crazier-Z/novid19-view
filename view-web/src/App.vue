@@ -1,5 +1,8 @@
 <template>
-  <div :style="{ background: `url(${bg})` }" class="box">
+  <div
+    :style="{ background: `url(${bg}) no-repeat 0 0 /100% 100%` }"
+    class="box"
+  >
     <div style="color: white" class="box-left">
       <div class="box-left-card">
         <section>
@@ -33,6 +36,8 @@
           <div>累计死亡</div>
         </section>
       </div>
+      <div class="box-left-pie"></div>
+      <div class="box-left-line"></div>
     </div>
     <div class="box-center" id="map"></div>
     <div style="color: white" class="box-right">
@@ -64,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import bg from "@/assets/1.jpg";
+import bg from "@/assets/2.jpg";
 import { useStore } from "./stores";
 import { ref, reactive, onMounted } from "vue";
 import * as echarts from "echarts"; // echarts 5版本引入
@@ -77,6 +82,8 @@ const store = useStore();
 onMounted(async () => {
   await store.getList();
   initCharts();
+  initPie();
+  initLine();
 });
 
 const initCharts = () => {
@@ -198,6 +205,92 @@ const initCharts = () => {
     store.item = e.data.children;
   });
 };
+
+const initPie = () => {
+  const charts = echarts.init(
+    document.querySelector(".box-left-pie") as HTMLElement
+  );
+
+  const data = store.countriesDetail.map((item) => {
+    return {
+      name: item.name,
+      value: item.today.confirm,
+    };
+  });
+
+  charts.setOption({
+    backgroundColor: "rgba(38, 58, 87, 0.9)",
+    tooltip: {
+      trigger: "item",
+    },
+    series: [
+      {
+        type: "pie",
+        radius: ["40%", "70%"],
+        itemStyle: {
+          borderRadius: 4,
+          borderColor: "#fff",
+          borderWidth: 2,
+        },
+        label: {
+          show: true,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 15,
+          },
+        },
+        data,
+      },
+    ],
+  });
+};
+
+const initLine = () => {
+  const charts = echarts.init(
+    document.querySelector(".box-left-line") as HTMLElement
+  );
+  const xAxisData = store.countriesDetail.map((v) => v.name);
+  const data = store.countriesDetail.map((v) => v.today.confirm);
+  charts.setOption({
+    backgroundColor: "rgba(38, 58, 87, 0.9)",
+    tooltip: {
+      trigger: "axis",
+    },
+    grid: {
+      left: "3%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: xAxisData,
+      axisLine: {
+        lineStyle: {
+          color: "#fff",
+        },
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLine: {
+        lineStyle: {
+          color: "#fff",
+        },
+      },
+    },
+    label: {
+      show: true,
+    },
+    series: [
+      {
+        data,
+        type: "line",
+        smooth: true,
+      },
+    ],
+  });
+};
 </script>
 
 <style lang="less">
@@ -206,7 +299,7 @@ const initCharts = () => {
   margin: 0;
 }
 @itemColor: #41b0db;
-@itemBg: #223651;
+@itemBg: rgba(38, 58, 87, 0.9);
 @itemBorder: #212028;
 
 html,
@@ -243,15 +336,24 @@ body,
         }
       }
     }
+    &-pie {
+      height: 320px;
+      margin-top: 20px;
+    }
+    &-line {
+      height: 320px;
+      margin-top: 20px;
+    }
   }
   &-center {
     flex: 1;
+    margin: 0 10px;
   }
   &-right {
     width: 400px;
     .table {
       width: 100%;
-      background: #212028;
+      background: rgba(38, 58, 87, 0.9);
       tr {
         th {
           padding: 5px;

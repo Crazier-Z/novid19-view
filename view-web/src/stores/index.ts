@@ -9,6 +9,7 @@ export const useStore = defineStore({
     item: <AreaTree[]>[],
     chinaAdd: <Today>{},
     chinaTotal: <Total>{},
+    countriesDetail: <AreaTree[]>[],
   }),
   actions: {
     async getList() {
@@ -16,6 +17,7 @@ export const useStore = defineStore({
       this.list = result;
       this.chinaAdd = this.list.chinaTotal.today;
       this.chinaTotal = this.list.chinaTotal.total;
+      this.countriesDetail = this.list.areaTree.slice(0, 10);
     },
   },
 });
